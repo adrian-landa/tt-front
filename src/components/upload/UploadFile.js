@@ -8,6 +8,24 @@ import Zoom from '@material-ui/core/Zoom';
 import AddThumbnail from '../../res/AddThumbnail.svg';
 import axios from 'axios';
 import ResultSection from './section/ResultSection'
+import Amplify from 'aws-amplify';
+import { AWSIoTProvider } from '@aws-amplify/pubsub/lib/Providers';
+import { withRouter } from 'react-router-dom';
+import { URL_BASE } from '../../constants'
+
+Amplify.configure({
+    Auth: {
+        identityPoolId: process.env.REACT_APP_IDENTITY_POOL_ID,
+        region: process.env.REACT_APP_REGION,
+        userPoolId: process.env.REACT_APP_USER_POOL_ID,
+        userPoolWebClientId: process.env.REACT_APP_USER_POOL_WEB_CLIENT_ID
+    }
+});
+
+Amplify.addPluggable(new AWSIoTProvider({
+    aws_pubsub_region: process.env.REACT_APP_REGION,
+    aws_pubsub_endpoint: `wss://${process.env.REACT_APP_MQTT_ID}.iot.${process.env.REACT_APP_REGION}.amazonaws.com/mqtt`,
+}));
 
 const useStyles = makeStyles(theme => ({
     fab: {
@@ -26,6 +44,7 @@ function UploadFile(props) {
     const [file, setFile] = useState(null)
     const [url, setURL] = useState(null)
     const [resURL, setResURL] = useState(null)
+    const [fileURL, setFileURL] = useState(null)
     const [name, setName] = useState('')
     const [step, setStep] = useState(0)
     const [loading, setLoading] = useState(false)
@@ -40,8 +59,6 @@ function UploadFile(props) {
         setName(name)
     }
 
-
-
     const onUploadClickListener = () => {
         document.getElementById("chooser").click()
     }
@@ -49,6 +66,7 @@ function UploadFile(props) {
     const onClickListener = (action) => {
         switch (action) {
             case 'SEND':
+                Amplify.PubSub.publish('config', { file: fileURL })
                 setStep(0)
                 break;
             case 'PROCESS':
@@ -56,10 +74,13 @@ function UploadFile(props) {
                 const fd = new FormData();
                 fd.append('image', file, file.name);
                 fd.append('name', name);
-                axios.post('/content/', fd)
+                axios.post('/content/' + props.match.params['id'] + '/', fd)
                     .then(response => {
-                        const result = 'http://192.168.100.124:8000' + response.data.result
+                        console.log(response.data)
+                        const result = URL_BASE + response.data['result_file']
+                        const file = response.data['binary_file']
                         setResURL(result)
+                        setFileURL(file)
                         setStep(2)
                         setLoading(false)
                     })
@@ -146,13 +167,9 @@ function UploadFile(props) {
                     </Fab>
                 </Zoom>
             ))}
-
-
-
-
         </div>
     )
 }
 
-export default UploadFile
+export default withRouter(UploadFile)
 

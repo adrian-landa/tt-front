@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom'
 import axios from 'axios'
-
-axios.defaults.baseURL = 'http://192.168.100.124:8000'
+import {URL_BASE} from './constants'
+axios.defaults.baseURL = URL_BASE
 
 const app = (
     <BrowserRouter>

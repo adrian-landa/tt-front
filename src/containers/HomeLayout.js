@@ -7,6 +7,7 @@ import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
 import DashboardIcon from '@material-ui/icons/Dashboard';
+import DeveloperBoardIcon from '@material-ui/icons/DeveloperBoard';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import MenuIcon from '@material-ui/icons/Menu';
 import { MenuList, MenuItem } from '@material-ui/core'
@@ -78,9 +79,9 @@ function HomeLayout(props) {
       </MenuList>
       <Divider />
       <MenuList>
-        <MenuItem component={Link} to='/upload' onClick = {closeDrawer}>
-          <ListItemIcon><DashboardIcon /></ListItemIcon>
-          Dashboard
+        <MenuItem component={Link} to='/device' onClick = {closeDrawer}>
+          <ListItemIcon><DeveloperBoardIcon /></ListItemIcon>
+          Devices
         </MenuItem>
       </MenuList>
 
